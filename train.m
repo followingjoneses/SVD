@@ -1,7 +1,7 @@
 user_number = 943;
 item_number = 1682;
 FEATURE = 10;
-ITERATIONS = 150;
+ITERATIONS = 40;
 lambda = 0.02;
 gamma = 0.05;
 
@@ -9,6 +9,7 @@ m_set = ml_read('ml-100k/u.data', 0, user_number, item_number);
 
 data_set = zeros(user_number, item_number);
 rated_set = zeros(user_number, item_number);
+baseline = zeros(user_number, item_number);
 user_feature = 0.1 * rand(user_number, FEATURE) / sqrt(FEATURE);
 item_feature = 0.1 * rand(item_number, FEATURE) / sqrt(FEATURE);
 
@@ -34,7 +35,7 @@ for iter = 1 : ITERATIONS
     for u = 1 : user_number
         for i = 1 : item_number
             if rated_set(u, i) == 1
-                baseline = mean + user_bias(u) + item_bias(i);
+                baseline(u, i) = mean + user_bias(u) + item_bias(i);
                 eui = data_set(u, i) - predict(u, i, baseline, user_feature, item_feature);
                 temp_user_feature = user_feature(u, :);
                 temp_item_feature = item_feature(i, :);
@@ -53,6 +54,10 @@ for iter = 1 : ITERATIONS
     rmse = sqrt(sigma / rated_number);
     fprintf('iteration = %d, rmse = %f\n', iter, rmse);
 end
+
+save('100k-data/user_feature.mat', 'user_feature');
+save('100k-data/item_feature.mat', 'item_feature');
+save('100k-data/baseline.mat', 'baseline');
 
 
 
